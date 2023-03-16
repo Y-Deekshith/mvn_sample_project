@@ -3,6 +3,14 @@ pipeline {
     tools { 
         maven 'Maven3' 
     }
+    environment {
+        dockerImage = ''
+        AWS_DEFAULT_REGION = "us-east-1"
+        IMAGE_REPO_NAME = "devops"
+        IMAGE_TAG = "$BUILD_NUMBER"
+        REPOSITORY_URI = "https://${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com"
+        ECRcredentials = "ecr:${AWS_DEFAULT_REGION}:Aws_Cred"
+    }
 
     stages {
         stage('Git Checkout') {
@@ -29,10 +37,10 @@ pipeline {
                 // sh 'mv target/jb-hello-world-maven-0.1.0.jar jb-hello-world-maven-${BUILD_NUMBER}.jar'
             }
         }
-        stage('Bulding the Image') {
-            steps {
+        stage('Building our image') {
+            steps{
                 script {
-                  dockerImage  = docker.build imageName + ":$BUILD_NUMBER"
+                    dockerImage = docker.build "${IMAGE_REPO_NAME}:$BUILD_NUMBER"
                 }
             }
         }
