@@ -29,13 +29,13 @@ pipeline {
                 // sh 'mv target/jb-hello-world-maven-0.1.0.jar jb-hello-world-maven-${BUILD_NUMBER}.jar'
             }
         }
-        // stage('Bulding the Image') {
-        //     steps {
-        //         script {
-        //           dockerImage  = docker.build imageName + ":$BUILD_NUMBER"
-        //         }
-        //     }
-        // }
+        stage('Bulding the Image') {
+            steps {
+                script {
+                  dockerImage  = docker.build imageName + ":$BUILD_NUMBER"
+                }
+            }
+        }
         
         // stage('Publishing the Image') {
         //     steps {
