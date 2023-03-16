@@ -1,0 +1,78 @@
+trigger:
+- main
+
+pool:
+  vmImage: ubuntu-latest
+
+steps:
+- task: HelmInstaller@0
+  inputs:
+    helmVersion: '3.0.0'
+    installKubectl: true
+  displayName: Installing helm
+
+- task: Maven@3
+  inputs:
+    mavenPomFile: 'pom.xml'
+    goals: 'compile'
+    publishJUnitResults: false
+    javaHomeOption: 'JDKVersion'
+    mavenVersionOption: 'Default'
+    mavenAuthenticateFeed: false
+    effectivePomSkip: false
+    sonarQubeRunAnalysis: false
+  displayName: 'Commpling  Package'
+
+- task: Maven@3
+  inputs:
+    mavenPomFile: 'pom.xml'
+    goals: 'install'
+    publishJUnitResults: false
+    javaHomeOption: 'JDKVersion'
+    mavenVersionOption: 'Default'
+    mavenAuthenticateFeed: false
+    effectivePomSkip: false
+    sonarQubeRunAnalysis: false
+  displayName: 'Installing Package'
+
+- task: CmdLine@2
+  inputs:
+    script: 'ls'
+    workingDirectory: 'target'
+  displayName: 'Viewing Directory Structure'
+  
+- script: |
+    cd target
+    ls
+  displayName: 'Just Viewing directory structure'
+  
+
+- task: Docker@2
+  inputs:
+    containerRegistry: 'My ACR Connection'
+    repository: 'myrepo'
+    command: 'buildAndPush'
+    Dockerfile: 'Dockerfile'
+    tags: |
+      $(Build.BuildId)
+  displayName: 'Building Image'
+
+
+- script: |
+    sudo docker images
+  displayName: 'Display Docker Images'
+  
+
+- task: CopyFiles@2
+  inputs:
+    SourceFolder: 'target'
+    Contents: '**'
+    TargetFolder: '$(Build.ArtifactStagingDirectory)'
+    CleanTargetFolder: true
+    OverWrite: true
+
+- task: PublishBuildArtifacts@1
+  inputs:
+   PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+   ArtifactName: myjar
+
