@@ -26,7 +26,7 @@ pipeline {
                 sh 'mvn compile'
                 sh 'mvn package'
                 sh 'mvn clean install'
-                sh 'mv target/*.war target/maven-web-application-${BUILD_NUMBER}.war'
+                sh 'mv target/*.jar target/jb-hello-world-maven-${BUILD_NUMBER}.jar'
             }
         }
         // stage('Bulding the Image') {
